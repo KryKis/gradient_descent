@@ -1,8 +1,8 @@
 CC=gcc
-CFLAGS=-O0 --Werror -pedantic
+CFLAGS=-O0 -Werror -pedantic
 
 projekt:
-	 $(CC) -o projekt gradient_descent.c
+	 $(CC) $(CFLAGS) gradient_descent.c  -o projekt -lm
 
 clean:
 	rm projekt
