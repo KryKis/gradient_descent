@@ -4,28 +4,35 @@
 #include "gradient_descent.h"
 
 float function(float *x, int dim){
-	int tmp = dim;
-	float result=0.0, multiplication=1.0;
-	while(dim--)
-		result += x[dim]*x[dim];
-	result /= 40.0;
-	result += 1.0;
-	while(tmp--)
-		multiplication *= cos(x[tmp]/tmp);
-	return result - multiplication;
+	float sum=0.0, multiplication=1.0;
+    int n = dim;
+    for(int i=0; i<n; i++)
+    {
+		sum += x[i]*x[i];
+		multiplication *= cos(x[i]/(i+1));
+	}
+    sum /= 40.0;
+    sum += 1.0;
+
+	return sum - multiplication;
 }
 
 float gradient(float *x, int dim) {
-	int tmp = dim;
-    float result=0.0, multiplication=1.0;
-    while(dim--)
-		
-        result += x[dim]*x[dim];
-    result /= 40.0;
-    result += 1.0;
-    while(tmp--)
-        multiplication *= cos(x[tmp]/tmp);
-   return result - multiplication;	
+	int n = dim;
+    float sum_d=0.0, multiplication_d=1.0;
+    for(int i=0; i<n; i++)
+    {
+        sum_d += 2.0*x[i];
+        float partial_d = -1.0/(i+1)*sin(x[i]/(i+1));
+        for(int j=0; j<n; j++)
+        {
+            if(j != i)
+                partial_d *= cos(x[j]/(j+1));
+        }
+        multiplication_d += partial_d;
+    }
+    sum_d /= 40.0;
+   return sum_d - multiplication_d;	
 }
 
 float gradient_descent (inputT in) {
@@ -42,12 +49,26 @@ float gradient_descent (inputT in) {
 }
 int main() {
 	inputT input;
-//	scanf("%d, %f", &input.dimension, &input.epsilon);
+	//scanf("%d, %f", &input.dimension, &input.epsilon);
+    input.dimension = 1;
+    input.epsilon = 0.01;
 //	gradient_descent(input);
-	//f = open("output", 'w');
-	for(int x = -20; x<21; x++){
-		float a = (float) x;
-		printf("%f, %f", a, function(&a, 1)); 	
+	FILE *f = fopen("output", "w");
+	FILE *fd = fopen("outputD", "w");
+    
+    float *a = malloc(sizeof(float)*2);
+	for(int x = -20; x<21; x++)
+    {   
+        for(int y = -20; y<21; y++)
+        {
+            a[0] = (float)x;
+            a[1] = (float)y;
+		    fprintf(f, "%f, %f, %f\n", a[0], a[1], function(a, 2));
+		    fprintf(fd, "%f, %f, %f\n", a[0], a[1], gradient(a, 2));
+	    }
 	}
+    free(a);	
+    fclose(f);
+    fclose(fd);
 	
 }
