@@ -8,11 +8,11 @@
  * dim is equal to number of those variables/dimension of 
  * resolved problem
  */
-float function(float *x, int dim){
+double function(double *x, int dim){
     /* sum is the first element of equation and + 1
      * multiplication is the last one
      */
-    float sum=0.0, multiplication=1.0;
+    double sum=0.0, multiplication=1.0;
     int n = dim;
     for(int i=0; i<n; i++)
     {
@@ -26,9 +26,9 @@ float function(float *x, int dim){
 }
 
 
-float gradient_norm(float *dx, int dim)
+double gradient_norm(double *dx, int dim)
 {
-    float sum = 0.0;
+    double sum = 0.0;
     for(int i=0; i<dim; i++)
     {
         sum += dx[i]*dx[i];
@@ -39,10 +39,10 @@ float gradient_norm(float *dx, int dim)
 /* Returns value of gradient in position given by x vector
  * It equals to sum of partial derrivatives of all function variables
  */
-float *gradient(float *x, int dim) {
+double *gradient(double *x, int dim) {
 	int n = dim;
-    float *partial_derrivatives = malloc(sizeof(float)*dim);
-    float multiplication_d[dim];
+    double *partial_derrivatives = malloc(sizeof(double)*dim);
+    double multiplication_d[dim];
     for(int i=0; i<n; i++)
     {
         partial_derrivatives[i] = 2.0*x[i]/40.0;
@@ -64,27 +64,31 @@ float *gradient(float *x, int dim) {
 /* Returns found minimum
  */
 
-float gradient_descent (inputT in) {
+double gradient_descent (inputT in) {
 	int dimension = in.dimension;
 	int epsilon = in.epsilon;
-	float x[dimension];
-	float *dx = malloc(sizeof(dx)*in.dimension);
+	double x[dimension];
+	double *dx = malloc(sizeof(dx)*in.dimension);
 
     srand(time(NULL));
 	while(dimension--)
     {
         x[dimension] = rand()/RAND_MAX * 40.0 - 20.0;
 	}
-    while(gradient_norm(x, dimension) > 0.001) {
-        dx = gradient(x, dimension);
+    dx = gradient(x, dimension);
+    while(gradient_norm(dx, dimension) > 0.001) {
         for(int i=0; i<in.dimension; i++)
-		    x[i] -= in.epsilon * dx[i]; 
+            printf("current gradient is: [%f, %f]\n", dx[0], dx[1]);
+        for(int i=0; i<in.dimension; i++)
+		    x[i] -= in.epsilon * dx[i];
+        
+        dx = gradient(x, dimension); 
     }
     printf("Minimum found at: [");
     for(int i=0; i<in.dimension; i++)
         printf("%f, ", x[i]);
     printf("]\n");
-
+    free(dx);
     return function(x, in.dimension);
 
 }
@@ -95,16 +99,22 @@ int main() {
     input.dimension = 2;
     input.epsilon = 0.01;
 
+    printf("Minimum that was found: %f\n", gradient_descent(input));
+}
+
+
+
+
 /*	FILE *f = fopen("output", "w");
 	FILE *fd = fopen("outputD", "w");
     
-    float *a = malloc(sizeof(float)*2);
+    double *a = malloc(sizeof(double)*2);
 	for(int x = -20; x<21; x++)
     {   
         for(int y = -20; y<21; y++)
         {
-            a[0] = (float)x;
-            a[1] = (float)y;
+            a[0] = (double)x;
+            a[1] = (double)y;
 		    fprintf(f, "%f, %f, %f\n", a[0], a[1], function(a, 2));
 		    fprintf(fd, "%f, %f, %f\n", a[0], a[1], gradient(a, 2));
 	    }
@@ -114,5 +124,3 @@ int main() {
     fclose(f);
     fclose(fd);
 */	
-    printf("Minimum that was found: %f\n", gradient_descent(input));
-}
