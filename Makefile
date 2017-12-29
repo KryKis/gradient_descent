@@ -10,3 +10,6 @@ gradient_descent: gradient_descent.o
 
 clean:
 	rm -rf gradient_descent *.o
+
+
+all:    gradient_descent
